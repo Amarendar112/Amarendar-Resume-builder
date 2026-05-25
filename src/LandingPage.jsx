@@ -10,7 +10,8 @@ import {
   sendSignInLinkToEmail,
   isSignInWithEmailLink,
   signInWithEmailLink,
-  updatePassword
+  updatePassword,
+  isFirebaseConfigured
 } from "./firebase";
 import { signInWithPopup } from "firebase/auth";
 import logoImg from "./assets/skillsiniq-logo.svg";
@@ -40,6 +41,7 @@ export default function LandingPage({ onLoginSuccess }) {
   const isFormValid = isEmailValid && (authMode === "login" ? password.length > 0 : true);
 
   useEffect(() => {
+    if (!isFirebaseConfigured) return;
     if (isSignInWithEmailLink(auth, window.location.href)) {
       let savedEmail = window.localStorage.getItem("emailForSignIn");
       if (!savedEmail) savedEmail = window.prompt("Please provide your email for confirmation");
@@ -62,6 +64,10 @@ export default function LandingPage({ onLoginSuccess }) {
   const handleEmailAuth = async (e) => {
     e.preventDefault();
     if (!isEmailValid) return;
+    if (!isFirebaseConfigured) {
+      onLoginSuccess();
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -77,6 +83,10 @@ export default function LandingPage({ onLoginSuccess }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!isFirebaseConfigured) {
+      onLoginSuccess();
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -87,6 +97,10 @@ export default function LandingPage({ onLoginSuccess }) {
   };
 
   const handleGoogleLogin = async () => {
+    if (!isFirebaseConfigured) {
+      onLoginSuccess();
+      return;
+    }
     setError("");
     try {
       const result = await signInWithPopup(auth, googleProvider);

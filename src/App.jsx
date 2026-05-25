@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { auth } from "./firebase";
+import { auth, isFirebaseConfigured } from "./firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import LandingPage from "./LandingPage";
 import Dashboard from "./Dashboard";
@@ -26,13 +26,25 @@ export default function App() {
 
   // Listen for Firebase auth state changes
   useEffect(() => {
+    if (!isFirebaseConfigured) {
+      // Auto-log in Guest User instantly for offline/free deployment
+      setUser({ email: "guest@example.com", displayName: "Guest User", uid: "mock-guest" });
+      return;
+    }
+
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser || null);
     });
     return () => unsub();
   }, []);
 
-  const handleLogout = () => signOut(auth);
+  const handleLogout = () => {
+    if (!isFirebaseConfigured) {
+      setUser(null);
+      return;
+    }
+    signOut(auth);
+  };
 
   // Show loading splash while Firebase determines auth state
   if (user === undefined) {

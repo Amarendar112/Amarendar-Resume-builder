@@ -1,25 +1,11 @@
 services:
-  # 1. Flask Backend Web Service
+  # Vite Frontend Static Site (100% Free, No Credit Card Required)
   - type: web
-    name: amarendar-resume-builder-backend
-    env: python
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: gunicorn --chdir backend app:app
-    envVars:
-      - key: OPENAI_API_KEY
-        sync: false # Prompts the user to enter their OpenAI API key in the Render UI during setup
-
-  # 2. Vite Frontend Static Site
-  - type: web
-    name: amarendar-resume-builder-frontend
+    name: amarendar-resume-builder
     env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     routes:
-      # Proxy all frontend /api/ requests to the Flask backend
-      - type: rewrite
-        source: /api/*
-        destination: https://amarendar-resume-builder-backend.onrender.com/api/*
       # SPA routing fallback
       - type: rewrite
         source: /*
